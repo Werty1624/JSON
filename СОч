@@ -1,0 +1,90 @@
+import json
+import os
+
+
+class Student:
+    def __init__(self, id, name, age):
+        self.id = id
+        self.name = name
+        self.age = age
+
+
+class StudentManager:
+    def __init__(self):
+        self.filename = "students.json"
+        self.students = []
+
+    def load_from_file(self):
+        if not os.path.exists(self.filename):
+            self.save_to_file()
+            return
+
+        with open(self.filename, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        for item in data:
+            s = Student(item["id"], item["name"], item["age"])
+            self.students.append(s)
+
+    def save_to_file(self):
+        data = []
+        for s in self.students:
+            data.append({"id": s.id, "name": s.name, "age": s.age})
+
+        with open(self.filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        print("Сохранено")
+
+    def show_students(self):
+        if not self.students:
+            print("Список пуст")
+            return
+
+        for s in self.students:
+            print(f"{s.id}. {s.name}, {s.age} лет")
+
+    def add_student(self):
+        name = input("Введите имя: ")
+        age = int(input("Введите возраст: "))
+
+        if self.students:
+            new_id = self.students[-1].id + 1
+        else:
+            new_id = 1
+
+        s = Student(new_id, name, age)
+        self.students.append(s)
+        print(f"Студент {name} добавлен")
+
+
+def show_menu():
+    print("1. Показать студентов")
+    print("2. Добавить студента")
+    print("3. Сохранить в файл")
+    print("0. Выход")
+
+
+def main():
+    manager = StudentManager()
+    manager.load_from_file()
+
+    while True:
+        show_menu()
+        choice = input("Выберите действие: ")
+
+        if choice == "1":
+            manager.show_students()
+        elif choice == "2":
+            manager.add_student()
+        elif choice == "3":
+            manager.save_to_file()
+        elif choice == "0":
+            manager.save_to_file()
+            print("До свидания")
+            break
+        else:
+            print("Нет такого пункта")
+
+
+main()
